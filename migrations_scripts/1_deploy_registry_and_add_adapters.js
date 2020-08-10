@@ -29,6 +29,7 @@ const MstableStakingAdapter = artifacts.require('MstableStakingAdapter');
 const ChiAdapter = artifacts.require('ChiAdapter');
 const PieDAOPieAdapter = artifacts.require('PieDAOPieAdapter');
 const PoolTogetherAdapter = artifacts.require('PoolTogetherAdapter');
+const RariAssetAdapter = artifacts.require('RariAssetAdapter');
 const SynthetixAssetAdapter = artifacts.require('SynthetixAssetAdapter');
 const SynthetixDebtAdapter = artifacts.require('SynthetixDebtAdapter');
 const TokenSetsAdapter = artifacts.require('TokenSetsAdapter');
@@ -52,6 +53,7 @@ const MstableTokenAdapter = artifacts.require('MstableTokenAdapter');
 const ChiTokenAdapter = artifacts.require('ChiTokenAdapter');
 const PieDAOPieTokenAdapter = artifacts.require('PieDAOPieTokenAdapter');
 const PoolTogetherTokenAdapter = artifacts.require('PoolTogetherTokenAdapter');
+const RariTokenAdapter = artifacts.require('RariTokenAdapter');
 const TokenSetsTokenAdapter = artifacts.require('TokenSetsTokenAdapter');
 const UniswapV1TokenAdapter = artifacts.require('UniswapV1TokenAdapter');
 const UniswapV2TokenAdapter = artifacts.require('UniswapV2TokenAdapter');
@@ -183,6 +185,8 @@ const balancerWeth50Musd50Address = '0xe036CCE08cf4E23D33bC6B18e53Caf532AFa8513'
 const uniswapMtaWethAddress = '0x0d0d65E7A7dB277d3E0F5E1676325E75f3340455';
 
 const yfiAddress = '0x0bc529c00C6401aEF6D220BE8C6Ea1667F6Ad93e';
+
+const rftAddress = '0x9366B7C00894c3555c7590b0384e5F6a9D55659f';
 
 const aaveAssetAdapterTokens = [
   aDaiAddress,
@@ -367,6 +371,9 @@ const poolTogetherAdapterTokens = [
   saiPoolAddress,
   daiPoolAddress,
   usdcPoolAddress,
+];
+const rariAssetAdapterTokens = [
+  rftAddress,
 ];
 const synthetixAssetAdapterTokens = [
   snxAddress,
@@ -711,6 +718,18 @@ module.exports = async (deployer, network, accounts) => {
     '0',
   ]);
 
+  await deployer.deploy(RariAssetAdapter, { from: accounts[0] });
+  adapters.push([RariAssetAdapter.address]);
+  tokens.push([rariAssetAdapterTokens]);
+  protocolNames.push('Rari Capital');
+  metadata.push([
+    'Rari Capital',
+    'The smartest stable robo-advisor',
+    'rari.capital',
+    'protocol-icons.s3.amazonaws.com/rari.png',
+    '0',
+  ]);
+
   await deployer.deploy(SynthetixAssetAdapter, { from: accounts[0] });
   await deployer.deploy(SynthetixDebtAdapter, { from: accounts[0] });
   adapters.push([SynthetixAssetAdapter.address, SynthetixDebtAdapter.address]);
@@ -868,6 +887,12 @@ module.exports = async (deployer, network, accounts) => {
         PoolTogetherTokenAdapter.address,
       );
     });
+  await deployer.deploy(RariTokenAdapter, { from: accounts[0] })
+    .then(() => {
+      tokenAdapters.push(
+        RariTokenAdapter.address,
+      );
+    });
   await deployer.deploy(TokenSetsTokenAdapter, { from: accounts[0] })
     .then(() => {
       tokenAdapters.push(
@@ -914,6 +939,7 @@ module.exports = async (deployer, network, accounts) => {
           'Masset',
           'Chi token',
           'PoolTogether pool',
+          'Rari Fund token',
           'SetToken',
           'SmartToken',
           'Uniswap V1 pool token',
@@ -927,3 +953,22 @@ module.exports = async (deployer, network, accounts) => {
         });
     });
 };
+
+
+
+vaults tokens:
+
+"yearn.finance • Vaults"
+["yearn.finance • Vaults", "Yield aggregator for lending platforms", "yearn.finance", "protocol-icons.s3.amazonaws.com/yearn.png", 0]
+[0x49DD4a17a84A7c16d0b15AB75f325900Ae2F86ee]
+[[0x597aD1e0c13Bfe8025993D9e79C69E1c0233522e, 0x5dbcF33D8c2E976c6b560249878e6F1491Bca25c, 0x37d19d1c4E1fa9DC47bD1eA12f742a0887eDa74a, 0x881b06da56BB5675c54E4Ed311c21E54C5025298, 0x29E240CFD7946BA20895a7a02eDb25C210f9f324]]
+
+Bancor: add to bancor
+"Bancor"
+[0x3dcB6E6CddB8347161Fb8aD309C4033A0042086d]
+[[]]
+
+iearn v2: add to iearn v2
+"iearn.finance (v2)"
+[0xeF2D0790Ea45B45046D3f09F7B19ef9941ec66C9]
+[[0x0bc529c00C6401aEF6D220BE8C6Ea1667F6Ad93e, 0xdF5e0e81Dff6FAF3A7e52BA697820c5e32D806A8, 0x60626db611a9957C1ae4Ac5b7eDE69e24A3B76c5, 0x95C4B6C7CfF608c0CA048df8b81a484aA377172B]]
