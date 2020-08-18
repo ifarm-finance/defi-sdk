@@ -198,53 +198,26 @@ contract Router is SignatureVerifier("Zerion Router"), Ownable {
             absoluteAmount = getAbsoluteAmount(inputs[i], account);
             require(absoluteAmount > 0, "R: zero amount!");
 
-            // in case inputs includes fees:
-            //     - absolute amount is amount calculated based on inputs
-            //     - core_ amount is absolute amount excluding fee set in inputs
-            //     - beneficiary amount is beneficiary share (80%) of non-core_ amount
-            //     - this contract fee is the rest of beneficiary fee (~20%)
-            // otherwise no fees are charged!
+            uint256 feeAmount = 0;
+
             if (inputs[i].fee > 0) {
                 require(inputs[i].beneficiary != address(0), "R: bad beneficiary!");
                 require(inputs[i].fee <= BENEFICIARY_FEE_LIMIT, "R: bad fee!");
-
-                uint256 feeAmount = mul(absoluteAmount, inputs[i].fee) / DELIMITER;
-                uint256 beneficiaryAmount = mul(feeAmount, BENEFICIARY_SHARE) / DELIMITER;
-                uint256 thisAmount = feeAmount - beneficiaryAmount;
-                uint256 coreAmount = absoluteAmount - feeAmount;
-
+                feeAmount = mul(absoluteAmount, inputs[i].fee) / DELIMITER;
                 ERC20(inputs[i].token).safeTransferFrom(
                     account,
-                    address(core_),
-                    coreAmount,
+                    inputs[i].beneficiary,
+                    feeAmount,
                     "R![1]"
                 );
-
-                if (beneficiaryAmount > 0) {
-                    ERC20(inputs[i].token).safeTransferFrom(
-                        account,
-                        inputs[i].beneficiary,
-                        beneficiaryAmount,
-                        "R![2]"
-                    );
-                }
-
-                if (thisAmount > 0) {
-                    ERC20(inputs[i].token).safeTransferFrom(
-                        account,
-                        address(this),
-                        thisAmount,
-                        "R![3]"
-                    );
-                }
-            } else {
-                ERC20(inputs[i].token).safeTransferFrom(
-                    account,
-                    address(core_),
-                    absoluteAmount,
-                    "R!"
-                );
             }
+
+            ERC20(inputs[i].token).safeTransferFrom(
+                account,
+                address(core_),
+                absoluteAmount - feeAmount,
+                "R![2]"
+            );
         }
     }
 
